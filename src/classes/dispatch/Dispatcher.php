@@ -16,6 +16,10 @@ class Dispatcher
 
     public function run(): void
     {
+        if(!isset($_SESSION['user']) && $this->action !== 'signin') {
+            $this->action = 'signin';
+        }
+
         switch ($this->action) {
             case 'default':
                 $action = new act\DefaultAction();
@@ -37,6 +41,10 @@ class Dispatcher
                 $action = new act\AddUserAction();
                 $html = $action->execute();
                 break;
+            case 'signin':
+                $action = new act\SigninAction();
+                $html = $action->execute();
+                break;
         }
         $this->renderPage($html);
     }
@@ -54,6 +62,7 @@ class Dispatcher
    <h1>Deefy</h1>
    <ul>
          <li><a href="?action=default">Accueil</a></li>
+         <li><a href="?action=signin">Connexion</a></li>
          <li><a href="?action=add-user">Inscription</a></li>
          <li><a href="?action=add-playlist">Créer une playlist</a></li>
          <li><a href="?action=add-track">Ajouter une track dans la playlist</a></li>

@@ -11,6 +11,10 @@ class DefaultAction extends Action
 
     public function execute(): string
     {
-        return "<div>Bonjour !</div>";
+        if (isset($_SESSION['user'])) {
+            return "<div>Bonjour, " . htmlspecialchars($_SESSION['user']) . " !</div>";
+        } else {
+            return "<div>Bonjour !</div>";
+        }
     }
 }

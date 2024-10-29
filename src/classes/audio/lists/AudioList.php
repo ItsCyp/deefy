@@ -2,6 +2,8 @@
 
 namespace iutnc\deefy\audio\lists;
 
+use iutnc\deefy\exception as exception;
+
 class AudioList
 {
     protected string $nom;
@@ -31,7 +33,7 @@ class AudioList
         if(property_exists($this, $property)) {
             return $this->$property;
         } else {
-            throw new InvalidPropertyNameException($property);
+            throw new exception\InvalidPropertyNameException($property);
         }
     }
 }

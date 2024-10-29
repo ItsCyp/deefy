@@ -42,7 +42,7 @@ class AddTrackAction extends Action
                 $uploadFile = $uploadDir . $randomName;
 
                 if(move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
-                    $track = new tracks\PodcastTrack($title, $uploadFile, $duration);
+                    $track = new tracks\AlbumTrack($title, $uploadFile, "Inconnu", 0, $duration);
 
                     $playlist = $_SESSION['playlist'];
                     $playlist->ajouterPiste($track);

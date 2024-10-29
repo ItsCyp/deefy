@@ -2,6 +2,9 @@
 
 namespace iutnc\deefy\action;
 
+use iutnc\deefy\auth\AuthnProvider;
+use iutnc\deefy\exception\AuthnException;
+
 class AddUserAction extends Action
 {
 
@@ -12,21 +15,30 @@ class AddUserAction extends Action
         if ($this->http_method === 'GET') {
             $html = <<<HTML
                 <form method="post" action="?action=add-user">
-                    <label>Nom :
-                    <input type="text" name="name" placeholder="Nom" required><label><br>
-                    <label>Email :
-                    <input type="email" name="email" placeholder="Email" required><label><br>
-                    <label>Âge :
-                    <input type="number" name="age" placeholder="Âge" required><label><br>
-                    <button type="submit">Connexion</button>
+                    <label>Email:
+                    <input type="email" name="email" placeholder="email@example.com" required></label>
+                    <label>Password:
+                    <input type="password" name="passwd" required></label>
+                    <label>Confirm Password:
+                    <input type="password" name="confirm_passwd" required></label>
+                    <button type="submit">Register</button>
                 </form>
                 HTML;
         } elseif ($this->http_method === 'POST') {
-            $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
-            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-            $age = filter_var($_POST['age'], FILTER_SANITIZE_NUMBER_INT);
+            $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+            $password = filter_input(INPUT_POST, 'passwd', FILTER_SANITIZE_STRING);
+            $confirm_password = filter_input(INPUT_POST, 'confirm_passwd', FILTER_SANITIZE_STRING);
 
-            $html = "Nom: $name, Email: $email, Age: $age ans";
+            if ($password !== $confirm_password) {
+                $html = "<div>Error: Passwords do not match.</div>";
+            } else {
+                try {
+                    AuthnProvider::register($email, $password);
+                    $html = "<div>Registration successful. Welcome, $email!</div>";
+                } catch (AuthnException $e) {
+                    $html = "<div>Error: " . $e->getMessage() . "</div>";
+                }
+            }
         }
 
         return $html;
