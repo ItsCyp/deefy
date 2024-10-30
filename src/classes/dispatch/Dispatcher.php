@@ -16,16 +16,12 @@ class Dispatcher
 
     public function run(): void
     {
-        if(!isset($_SESSION['user']) && $this->action !== 'signin') {
-            $this->action = 'signin';
-        }
-
         switch ($this->action) {
             case 'default':
                 $action = new act\DefaultAction();
                 $html = $action->execute();
                 break;
-            case 'playlist':
+            case 'display-playlist':
                 $action = new act\DisplayPlaylistAction();
                 $html = $action->execute();
                 break;
@@ -66,7 +62,7 @@ class Dispatcher
          <li><a href="?action=add-user">Inscription</a></li>
          <li><a href="?action=add-playlist">Créer une playlist</a></li>
          <li><a href="?action=add-track">Ajouter une track dans la playlist</a></li>
-         <li><a href="?action=playlist">Afficher la playlist en session</a></li>
+         <li><a href="?action=display-playlist&id=1">Afficher la playlist en session</a></li>
     </ul>
     $html
 </body>

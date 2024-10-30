@@ -12,7 +12,7 @@ class DefaultAction extends Action
     public function execute(): string
     {
         if (isset($_SESSION['user'])) {
-            return "<div>Bonjour, " . htmlspecialchars($_SESSION['user']) . " !</div>";
+            return "<div>Bonjour, " . unserialize($_SESSION['user'])->email . " !</div>";
         } else {
             return "<div>Bonjour !</div>";
         }

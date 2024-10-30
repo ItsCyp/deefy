@@ -48,11 +48,30 @@ class DeefyRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM playlist WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        $playlist = $stmt->fetch();
-        if ($playlist === false) {
+        $playlistData = $stmt->fetch();
+        if ($playlistData === false) {
             throw new PDOException("Playlist not found.");
         }
-        return new Playlist($playlist['nom']);
+
+        $playlist = new Playlist($playlistData['nom']);
+
+        $stmt = $this->pdo->prepare('SELECT t.* FROM track t 
+                                 JOIN playlist2track p2t ON t.id = p2t.id_track 
+                                 WHERE p2t.id_pl = :id');
+        $stmt->execute(['id' => $id]);
+        $tracks = $stmt->fetchAll();
+
+        foreach ($tracks as $trackData) {
+            $track = new AlbumTrack(
+                $trackData['titre'],
+                $trackData['filename'],
+                $trackData['artiste_album'] ?? 'Unknown Artist',
+                $trackData['numero_album'] ?? 0,
+                $trackData['duree']);
+            $playlist->ajouterPiste($track);
+        }
+
+        return $playlist;
     }
 
     public function saveEmptyPlaylist(Playlist $playlist): Playlist

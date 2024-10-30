@@ -13,7 +13,7 @@ class SigninAction extends Action
         $html = "";
 
         if (isset($_SESSION['user'])) {
-            return "<div>Vous êtes déjà connecté en tant que " . htmlspecialchars($_SESSION['user']) . ".</div>";
+            return "<div>Vous êtes déjà connecté en tant que " . unserialize($_SESSION['user'])->email . ".</div>";
         }
 
         if($this->http_method === 'GET'){

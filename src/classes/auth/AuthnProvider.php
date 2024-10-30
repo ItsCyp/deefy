@@ -12,12 +12,13 @@ class AuthnProvider
     {
         $repo = DeefyRepository::getInstance();
         try {
-            $stmt = $repo->getPdo()->prepare('SELECT passwd FROM user WHERE email = :email');
+            $stmt = $repo->getPdo()->prepare('SELECT * FROM user WHERE email = :email');
             $stmt->execute(['email' => $email]);
             $user = $stmt->fetch();
+            $user = new User($user['id'], $user['email'], $user['passwd'], $user['role']);
 
-            if ($user && password_verify($password, $user['passwd'])) {
-                $_SESSION['user'] = $email;
+            if (password_verify($password, $user->password)) {
+                $_SESSION['user'] = serialize($user);
             } else {
                 throw new AuthnException("Invalid credentials.");
             }
@@ -59,5 +60,14 @@ class AuthnProvider
         $upper = preg_match("#[A-Z]#", $pass);       // au moins une majuscule
 
         return $length && $digit && $special && $lower && $upper;
+    }
+
+    public static function getSignedInUser(): User
+    {
+        if (!isset($_SESSION['user'])) {
+            throw new AuthnException("User is not signed in.");
+        }
+
+        return unserialize($_SESSION['user']);
     }
 }
