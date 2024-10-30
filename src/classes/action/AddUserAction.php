@@ -14,13 +14,14 @@ class AddUserAction extends Action
 
         if ($this->http_method === 'GET') {
             $html = <<<HTML
+                <h2>Inscription</h2>
                 <form method="post" action="?action=add-user">
                     <label>Email:
-                    <input type="email" name="email" placeholder="email@example.com" required></label>
+                    <input type="email" name="email" placeholder="email@example.com" required></label><br>
                     <label>Password:
-                    <input type="password" name="passwd" required></label>
+                    <input type="password" name="passwd" required></label><br>
                     <label>Confirm Password:
-                    <input type="password" name="confirm_passwd" required></label>
+                    <input type="password" name="confirm_passwd" required></label><br>
                     <button type="submit">Register</button>
                 </form>
                 HTML;

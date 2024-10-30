@@ -18,11 +18,12 @@ class SigninAction extends Action
 
         if($this->http_method === 'GET'){
             $html = <<<HTML
+                <h2>Connexion</h2>
                 <form method="post" action="?action=signin">
                     <label>Email:
-                    <input type="email" name="email" placeholder="email@example.com" required></label>
+                    <input type="email" name="email" placeholder="email@example.com" required></label><br>
                     <label>Password:
-                    <input type="password" name="passwd" required></label>
+                    <input type="password" name="passwd" required></label><br>
                     <button type="submit">Sign In</button>
                 </form>
                 HTML;

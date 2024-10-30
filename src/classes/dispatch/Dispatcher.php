@@ -47,6 +47,12 @@ class Dispatcher
 
     private function renderPage(string $html): void
     {
+        $playlistLink = '';
+        if (isset($_SESSION['playlist'])) {
+            $playlistId = $_SESSION['playlist_id'];
+            $playlistLink = "<li><a href='?action=display-playlist&id={$playlistId}'>Afficher la playlist en session</a></li>";
+        }
+
         echo <<<HTML
 <!DOCTYPE html>
 <html lang="fr">
@@ -62,7 +68,7 @@ class Dispatcher
          <li><a href="?action=add-user">Inscription</a></li>
          <li><a href="?action=add-playlist">Créer une playlist</a></li>
          <li><a href="?action=add-track">Ajouter une track dans la playlist</a></li>
-         <li><a href="?action=display-playlist&id=1">Afficher la playlist en session</a></li>
+         $playlistLink
     </ul>
     $html
 </body>

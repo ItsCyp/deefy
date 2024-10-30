@@ -44,6 +44,16 @@ class DeefyRepository
         return self::$instance;
     }
 
+
+    /*
+     * Methode de recherche dans la base de données :
+     */
+
+    /**
+     * Methode de recherche d'une playlist par son identifiant
+     * @param int $id
+     * @return Playlist
+     */
     public function findPlaylistById(int $id): Playlist
     {
         $stmt = $this->pdo->prepare('SELECT * FROM playlist WHERE id = :id');
@@ -78,64 +88,83 @@ class DeefyRepository
     {
         $stmt = $this->pdo->prepare('INSERT INTO playlist (nom) VALUES (:nom)');
         $stmt->execute(['nom' => $playlist->nom]);
+        $playlistId = $this->pdo->lastInsertId();
+        $_SESSION['playlist_id']=$playlistId;
+
+        $stmt = $this->pdo->prepare('INSERT INTO user2playlist (id_user, id_pl) VALUES (:id_user, :id_pl)');
+        $stmt->execute(['id_user' => unserialize($_SESSION['user'])->id, 'id_pl' => $playlistId]);
+
         return $playlist;
     }
 
-    public function saveTrack(AudioTrack $track): AudioTrack
+    public function saveTrack(AudioTrack $track): int
     {
         if($track instanceof AlbumTrack) {
-            $stmt = $this->pdo->prepare('INSERT INTO track (titre, filename, auteur, duree) VALUES (:titre, :filename, :auteur, :duree)');
+            $stmt = $this->pdo->prepare('INSERT INTO track (titre, filename, artiste_album, numero_album, duree) 
+                                         VALUES (:titre, :filename, :artiste_album, :numero_album, :duree)');
             $stmt->execute([
                 'titre' => $track->titre,
                 'filename' => $track->nom_du_fichier,
-                'auteur' => $track->auteur,
+                'artiste_album' => $track->artiste,
+                'numero_album' => $track->numero_piste,
                 'duree' => $track->duree
             ]);
         } else {
             throw new PDOException("Track type not supported.");
         }
-        return $track;
+        return $this->pdo->lastInsertId();
     }
 
-    public function addTrackToPlaylist(AudioTrack $track, Playlist $playlist): Playlist
+    /**
+     * Methode addTrackToPlaylist() permettant d'ajouter un piste existante (dans la db) à une playlist existante (dans la db)
+     * @param int $id_track
+     * @param int $id_pl
+     * @return void
+     */
+    public function addTrackToPlaylist(int $id_track, int $id_pl): void
     {
-        $trackId = $this->getTrackId($track);
-        $playlistId = $this->getPlaylistId($playlist);
-        $trackCount = $this->getTrackCountInPlaylist($playlistId);
-
-        $stmt = $this->pdo->prepare('INSERT INTO playlist2track (id_pl, id_track, ordre) VALUES (:id_pl, :id_track, :ordre)');
-        $stmt->execute(['id_pl' => $playlistId, 'id_track' => $trackId, 'ordre' => $trackCount + 1]);
-        return $playlist;
-    }
-
-    private function getTrackId(AlbumTrack $track): int
-    {
-        $stmt = $this->pdo->prepare('SELECT id FROM track WHERE titre = :titre AND filename = :chemin_fichier');
-        $stmt->execute(['titre' => $track->titre, 'chemin_fichier' => $track->nom_du_fichier]);
-        $result = $stmt->fetch();
-        if ($result === false) {
-            throw new PDOException("Track not found.");
+        // Vérifier si l'id_track existe
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM track WHERE id = :id_track');
+        $stmt->execute(['id_track' => $id_track]);
+        if ($stmt->fetchColumn() == 0) {
+            throw new PDOException("Track ID not found.");
         }
-        return (int)$result['id'];
-    }
 
-    private function getPlaylistId(Playlist $playlist): int
-    {
-        $stmt = $this->pdo->prepare('SELECT id FROM playlist WHERE nom = :nom');
-        $stmt->execute(['nom' => $playlist->nom]);
-        $result = $stmt->fetch();
-        if ($result === false) {
-            throw new PDOException("Playlist not found.");
+        // Vérifier si l'id_pl existe
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM playlist WHERE id = :id_pl');
+        $stmt->execute(['id_pl' => $id_pl]);
+        if ($stmt->fetchColumn() == 0) {
+            throw new PDOException("Playlist ID not found.");
         }
-        return (int)$result['id'];
+
+        $stmt = $this->pdo->prepare('INSERT INTO playlist2track (id_pl, id_track, no_piste_dans_liste) VALUES (:id_pl, :id_track, :no_piste_dans_liste)');
+        $stmt->execute(['id_pl' => $id_pl, 'id_track' => $id_track, 'no_piste_dans_liste' => $this->getTrackCountInPlaylist($id_pl) + 1]);
     }
 
-    private function getTrackCountInPlaylist(int $playlistId): int
+    public function getTrackCountInPlaylist(int $id_pl): int
     {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) as count FROM playlist2track WHERE id_pl = :id_pl');
-        $stmt->execute(['id_pl' => $playlistId]);
-        $result = $stmt->fetch();
-        return (int)$result['count'];
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM playlist2track WHERE id_pl = :id_pl');
+        $stmt->execute(['id_pl' => $id_pl]);
+        return $stmt->fetchColumn();
+    }
+
+//    public function addTrackToPlaylist(AudioTrack $track, Playlist $playlist): Playlist
+//    {
+//        $trackId = $this->getTrackId($track);
+//        $playlistId = $this->getPlaylistId($playlist);
+//        $trackCount = $this->getTrackCountInPlaylist($playlistId);
+//
+//        $stmt = $this->pdo->prepare('INSERT INTO playlist2track (id_pl, id_track, ordre) VALUES (:id_pl, :id_track, :ordre)');
+//        $stmt->execute(['id_pl' => $playlistId, 'id_track' => $trackId, 'ordre' => $trackCount + 1]);
+//        return $playlist;
+//    }
+
+    public function findPlaylistsByUser(int $id): array
+    {
+        $stmt = $this->pdo->prepare('SELECT id_pl FROM user2playlist WHERE id_user = :id');
+        $stmt->execute(['id' => $id]);
+        $playlists = $stmt->fetchAll();
+        return $playlists;
     }
 
     public function getPdo()

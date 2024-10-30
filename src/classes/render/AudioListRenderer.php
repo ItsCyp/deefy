@@ -23,7 +23,7 @@ class AudioListRenderer implements Renderer
     private function afficher()
     {
         $html = "<div>";
-        $html .= "<h3>{$this->audioList->nom} :</h3>";
+        $html .= "<h2>{$this->audioList->nom} :</h2>";
         foreach ($this->audioList->pistes as $piste) {
             if ($piste instanceof tracks\AlbumTrack) {
                 $renderer = new AlbumTrackRenderer($piste);

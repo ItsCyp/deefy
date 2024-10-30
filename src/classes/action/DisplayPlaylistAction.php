@@ -13,14 +13,17 @@ class DisplayPlaylistAction extends Action
     public function execute(): string
     {
         $html = '';
-        $id = $_GET['id'] ?? 1;
+        $_SESSION['playlist_id'] = $_GET['id'];
+        $id = $_SESSION['playlist_id'];
         $repo = DeefyRepository::getInstance();
         try {
             Authz::checkPlaylistOwner($id);
 
             $playlist = $repo->findPlaylistById($id);
+            $_SESSION['playlist'] = $playlist;
             $renderer = new render\AudioListRenderer($playlist);
             $html = $renderer->render(1);
+            $html .= '<a href="?action=add-track">Ajouter une piste</a>';
         }catch (AccessControlException $e){
             $html = "Acces Denied: " . $e->getMessage();
         }catch (\Exception $e){

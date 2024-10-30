@@ -29,9 +29,9 @@ class AuthnProvider
 
     public static function register(string $email, string $password): void
     {
-        if (!self::checkPasswordStrength($password, 10)) {
-            throw new AuthnException("Password does not meet the required strength.");
-        }
+//        if (!self::checkPasswordStrength($password, 10)) {
+//            throw new AuthnException("Password does not meet the required strength.");
+//        }
 
         $repo = DeefyRepository::getInstance();
         try {
@@ -45,7 +45,7 @@ class AuthnProvider
             $stmt = $repo->getPdo()->prepare('INSERT INTO user (email, passwd, role) VALUES (:email, :passwd, 1)');
             $stmt->execute(['email' => $email, 'passwd' => $hashed_password]);
 
-            $_SESSION['user'] = $email;
+            self::signin($email, $password);
         } catch (\PDOException $e) {
             throw new AuthnException("Database error: " . $e->getMessage());
         }

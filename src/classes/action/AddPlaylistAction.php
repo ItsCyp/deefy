@@ -14,16 +14,17 @@ class AddPlaylistAction extends Action
 
         if ($this->http_method === 'GET') {
             $html = <<<HTML
+                <h2>Créer une playlist</h2>
                 <form method="post" action="?action=add-playlist">
                     <label>Nom de la playlist :
-                    <input type="text" name="name" placeholder="<name>"><label>
+                    <input type="text" name="name" placeholder="<name>"><label><br>
                     <button type="submit">Créer la playlist</button>
                 </form>
                 HTML;
         } elseif ($this->http_method === 'POST') {
             $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
             $r = repo\DeefyRepository::getInstance();
-            $_SESSION['playlist']  = $r->saveEmptyPlaylist(new lists\Playlist($name));
+            $_SESSION['playlist'] = $r->saveEmptyPlaylist(new lists\Playlist($name));
             if (isset($_SESSION['playlist'])) {
                 $renderer = new \iutnc\deefy\render\AudioListRenderer($_SESSION['playlist']);
                 $html = $renderer->render(1);

@@ -17,6 +17,7 @@ class AddTrackAction extends Action
 
         if ($this->http_method === 'GET') {
             $html = <<<HTML
+                <h2>Ajouter une piste à la playlist</h2>
                 <form method="post" action="?action=add-track" enctype="multipart/form-data">
                     <label>Titre de la piste :
                     <input type="text" name="title" placeholder="Titre"><label><br>
@@ -44,9 +45,16 @@ class AddTrackAction extends Action
                 if(move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
                     $track = new tracks\AlbumTrack($title, $uploadFile, "Inconnu", 0, $duration);
 
-                    $playlist = $_SESSION['playlist'];
-                    $playlist->ajouterPiste($track);
+                    // Enregistrer la piste dans la base de données
+                    $repository = \iutnc\deefy\repository\DeefyRepository::getInstance();
+                    $id_track = $repository->saveTrack($track);
+
+                    // Ajouter la piste à la playlist
+                    $repository->addTrackToPlaylist($id_track, $_SESSION['playlist_id']);
+
+                    $playlist = $repository->findPlaylistById($_SESSION['playlist_id']);
                     $_SESSION['playlist'] = $playlist;
+
 
                     $renderer = new render\AudioListRenderer($playlist);
                     $html = $renderer->render(1);
