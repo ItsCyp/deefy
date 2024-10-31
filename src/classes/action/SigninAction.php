@@ -12,10 +12,12 @@ class SigninAction extends Action
     {
         $html = "";
 
+        // Vérifie si l'utilisateur est déjà connecté
         if (isset($_SESSION['user'])) {
             return "<div>Vous êtes déjà connecté en tant que " . unserialize($_SESSION['user'])->email . ".</div>";
         }
 
+        // Affiche le formulaire de connexion si la méthode HTTP est GET
         if($this->http_method === 'GET'){
             $html = <<<HTML
                 <h2>Connexion</h2>
@@ -27,10 +29,13 @@ class SigninAction extends Action
                     <button type="submit">Sign In</button>
                 </form>
                 HTML;
-        } elseif($this->http_method === 'POST'){
+        }
+        // Traite le formulaire de connexion si la méthode HTTP est POST
+        elseif($this->http_method === 'POST'){
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = filter_input(INPUT_POST, 'passwd', FILTER_SANITIZE_STRING);
             try {
+                // Authentifie l'utilisateur
                 AuthnProvider::signin($email, $password);
                 $html = "<div>Authentication successful. Welcome, $email!</div>";
             } catch (AuthnException $e) {

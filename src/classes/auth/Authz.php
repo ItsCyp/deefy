@@ -7,25 +7,44 @@ use iutnc\deefy\auth\User;
 use iutnc\deefy\repository\DeefyRepository;
 use iutnc\deefy\exception\AccessControlException;
 
-
-
+/**
+ * Classe Authz
+ * Gère les autorisations des utilisateurs.
+ */
 class Authz
 {
     private User $authenticated_user;
 
+    /**
+     * Constructeur de la classe Authz.
+     *
+     * @param User $user L'utilisateur authentifié.
+     */
     public function __construct(User $user)
     {
         $this->authenticated_user = $user;
     }
 
+    /**
+     * Vérifie si l'utilisateur a le rôle requis.
+     *
+     * @param int $required Le rôle requis.
+     * @throws AccessControlException Si l'utilisateur n'a pas le rôle requis.
+     */
     public function checkRole(int $required): void
     {
         $user = AuthnProvider::getSignedInUser();
         if ($user->role >= $required) {
-            throw new AccessControlException("You do not have the required role to access this resource.");
+            throw new AccessControlException("Vous n'avez pas le rôle requis pour accéder à cette ressource.");
         }
     }
 
+    /**
+     * Vérifie si l'utilisateur est propriétaire de la playlist.
+     *
+     * @param int $playlistId L'identifiant de la playlist.
+     * @throws AccessControlException Si l'utilisateur n'a pas accès à la playlist ou n'est pas administrateur.
+     */
     public static function checkPlaylistOwner(int $playlistId): void
     {
         $user = AuthnProvider::getSignedInUser();
@@ -35,7 +54,7 @@ class Authz
         $access = $stmt->fetch();
 
         if (!$access && $user->role !== 100) {
-            throw new AccessControlException("User does not have access to the playlist or is not an admin.");
+            throw new AccessControlException("L'utilisateur n'a pas accès à la playlist ou n'est pas administrateur.");
         }
     }
 }

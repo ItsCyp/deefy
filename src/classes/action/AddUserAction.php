@@ -12,6 +12,7 @@ class AddUserAction extends Action
     {
         $html = "";
 
+        // Affiche le formulaire d'inscription si la méthode HTTP est GET
         if ($this->http_method === 'GET') {
             $html = <<<HTML
                 <h2>Inscription</h2>
@@ -25,15 +26,19 @@ class AddUserAction extends Action
                     <button type="submit">Register</button>
                 </form>
                 HTML;
-        } elseif ($this->http_method === 'POST') {
+        }
+        // Traite le formulaire d'inscription si la méthode HTTP est POST
+        elseif ($this->http_method === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
             $password = filter_input(INPUT_POST, 'passwd', FILTER_SANITIZE_STRING);
             $confirm_password = filter_input(INPUT_POST, 'confirm_passwd', FILTER_SANITIZE_STRING);
 
+            // Vérifie si les mots de passe correspondent
             if ($password !== $confirm_password) {
                 $html = "<div>Error: Passwords do not match.</div>";
             } else {
                 try {
+                    // Enregistre l'utilisateur
                     AuthnProvider::register($email, $password);
                     $html = "<div>Registration successful. Welcome, $email!</div>";
                 } catch (AuthnException $e) {

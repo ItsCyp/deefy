@@ -4,15 +4,33 @@ namespace iutnc\deefy\render;
 
 use iutnc\deefy\audio\tracks as tracks;
 
+/**
+ * Classe AlbumTrackRenderer
+ *
+ * Cette classe est responsable du rendu des pistes d'album.
+ */
 class AlbumTrackRenderer extends AudioTrackRenderer
 {
+    /**
+     * @var tracks\AlbumTrack $albumTrack Instance de la piste d'album
+     */
     private tracks\AlbumTrack $albumTrack;
 
+    /**
+     * Constructeur de la classe AlbumTrackRenderer
+     *
+     * @param tracks\AlbumTrack $a Instance de la piste d'album
+     */
     public function __construct(tracks\AlbumTrack $a)
     {
         $this->albumTrack = $a;
     }
 
+    /**
+     * Rend le contenu compact de la piste d'album
+     *
+     * @return string Le rendu compact de la piste d'album
+     */
     protected function renderCompact(): string
     {
         return "
@@ -26,6 +44,11 @@ class AlbumTrackRenderer extends AudioTrackRenderer
         ";
     }
 
+    /**
+     * Rend le contenu détaillé de la piste d'album
+     *
+     * @return string Le rendu détaillé de la piste d'album
+     */
     protected function renderLong(): string
     {
         return "

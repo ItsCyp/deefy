@@ -5,15 +5,26 @@ namespace iutnc\deefy\dispatch;
 
 use iutnc\deefy\action as act;
 
+/**
+ * Classe Dispatcher
+ * Gère la distribution des actions en fonction des requêtes.
+ */
 class Dispatcher
 {
     private ?string $action = null;
 
+    /**
+     * Constructeur de la classe Dispatcher.
+     * Initialise l'action à partir des paramètres GET.
+     */
     function __construct()
     {
-        $this->action = isset($_GET['action']) ? $_GET['action'] : 'default';
+        $this->action = isset($_GET['action']) ? filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING) : 'default';
     }
 
+    /**
+     * Exécute l'action en fonction de la valeur de $action.
+     */
     public function run(): void
     {
         switch ($this->action) {
@@ -45,12 +56,17 @@ class Dispatcher
         $this->renderPage($html);
     }
 
+    /**
+     * Affiche la page HTML avec le contenu généré par l'action.
+     *
+     * @param string $html Le contenu HTML à afficher.
+     */
     private function renderPage(string $html): void
     {
         $playlistLink = '';
         if (isset($_SESSION['playlist'])) {
-            $playlistId = $_SESSION['playlist_id'];
-            $playlistLink = "<li><a href='?action=display-playlist&id={$playlistId}'>Afficher la playlist en session</a></li>";
+            $playlistId = htmlspecialchars($_SESSION['playlist_id'], ENT_QUOTES, 'UTF-8');
+            $playlistLink = "<a href='?action=display-playlist&id={$playlistId}'>Afficher la playlist en session</a>";
         }
 
         echo <<<HTML
@@ -59,18 +75,25 @@ class Dispatcher
 <head>
     <meta charset="UTF-8">
     <title>Deefy</title>
+    <link rel="stylesheet" type="text/css" href="src/css/styles.css">
 </head>
 <body>
-   <h1>Deefy</h1>
-   <ul>
-         <li><a href="?action=default">Accueil</a></li>
-         <li><a href="?action=signin">Connexion</a></li>
-         <li><a href="?action=add-user">Inscription</a></li>
-         <li><a href="?action=add-playlist">Créer une playlist</a></li>
-         <li><a href="?action=add-track">Ajouter une track dans la playlist</a></li>
-         $playlistLink
-    </ul>
-    $html
+    <nav>
+        <div class="nav-links">
+            <a href="?action=default">Accueil</a>
+            <a href="?action=signin">Connexion</a>
+            <a href="?action=add-user">Inscription</a>
+            <a href="?action=add-playlist">Créer une playlist</a>
+            <a href="?action=add-track">Ajouter une track dans la playlist</a>
+            $playlistLink
+        </div>
+    </nav>
+    
+    <h1>Deefy</h1>
+    
+    <div class="container">
+        $html
+    </div>
 </body>
 </html>
 HTML;

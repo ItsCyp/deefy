@@ -11,10 +11,17 @@ class AddTrackAction extends Action
     {
         $html = "";
 
-        if (!isset($_SESSION['playlist'])) {
-            return "<div>Erreur : aucune playlist n'a été trouvée.</div>";
+        // Vérifie si l'utilisateur est connecté
+        if(!isset($_SESSION['user'])) {
+            return "<div>Vous devez être connecté pour accéder à cette page. <a href='?action=signin'>Connexion</a></div>";
         }
 
+        // Vérifie si une playlist est sélectionnée
+        if (!isset($_SESSION['playlist'])) {
+            return "<div>Aucune playlist sélectionnée. <a href='?action=default'>Accueil</a></div>";
+        }
+
+        // Affiche le formulaire d'ajout de piste si la méthode HTTP est GET
         if ($this->http_method === 'GET') {
             $html = <<<HTML
                 <h2>Ajouter une piste à la playlist</h2>
@@ -28,6 +35,7 @@ class AddTrackAction extends Action
                     <button type="submit">Ajouter la piste</button>
                 </form>
                 HTML;
+            // Traite le formulaire d'ajout de piste si la méthode HTTP est POST
         } elseif ($this->http_method === 'POST') {
             $title = filter_var($_POST['title'], FILTER_SANITIZE_STRING);
             $duration = filter_var($_POST['duration'], FILTER_SANITIZE_NUMBER_INT);
@@ -58,7 +66,7 @@ class AddTrackAction extends Action
 
                     $renderer = new render\AudioListRenderer($playlist);
                     $html = $renderer->render(1);
-                    $html .= '<a href="?action=add-track">Ajouter encore une piste</a>';
+                    $html .= '<a class="common-link" href="?action=add-track">Ajouter encore une piste</a>';
                 } else {
                     return "<div>Erreur : impossible de télécharger le fichier.</div>";
                 }

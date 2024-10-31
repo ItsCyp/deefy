@@ -1,0 +1,79 @@
+/* Styles de base */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(#34344A, #1E1E1E);
+    background-attachment: fixed;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Titre principal */
+h1 {
+    font-size: 3em;
+    margin-top: 250px;
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Menu de navigation */
+nav {
+    position: fixed; /* Fixe le menu */
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    z-index: 1000;
+}
+
+.nav-links {
+    display: flex;
+    background: rgba(52, 52, 74, 0.6); /* Couleur de fond semi-transparente */
+    border-radius: 40px; /* Bords arrondis */
+    padding: 16px 40px;
+    backdrop-filter: blur(40px); /* Effet de flou */
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-size: 1em;
+}
+
+.nav-links a:hover {
+    color: #bdbdbd;
+}
+
+/* Conteneur principal pour les autres éléments */
+.container {
+    max-width: 800px;
+    padding: 20px;
+    margin-top: 120px;
+    text-align: center;
+}
+
+/* Listes de liens (ex. playlists) */
+ul {
+    display: grid;
+    list-style-type: none;
+    padding: 0;
+    margin: 20px ;
+    text-align: center;
+    gap: 10px;
+}
+
+.common-link {
+    color: #667aff;
+    text-decoration: underline;
+    padding: 10px 15px;
+    font-size: 1em;
+}
+
+.common-link:hover {
+    color: #0424c4;
+}
