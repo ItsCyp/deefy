@@ -30,8 +30,8 @@ class AddUserAction extends Action
         // Traite le formulaire d'inscription si la méthode HTTP est POST
         elseif ($this->http_method === 'POST') {
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-            $password = filter_input(INPUT_POST, 'passwd', FILTER_SANITIZE_STRING);
-            $confirm_password = filter_input(INPUT_POST, 'confirm_passwd', FILTER_SANITIZE_STRING);
+            $password = $_POST['passwd'];
+            $confirm_password = $_POST['confirm_passwd'];
 
             // Vérifie si les mots de passe correspondent
             if ($password !== $confirm_password) {

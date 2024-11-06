@@ -33,7 +33,7 @@ class SigninAction extends Action
         // Traite le formulaire de connexion si la méthode HTTP est POST
         elseif($this->http_method === 'POST'){
             $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-            $password = filter_input(INPUT_POST, 'passwd', FILTER_SANITIZE_STRING);
+            $password = $_POST['passwd'];
             try {
                 // Authentifie l'utilisateur
                 AuthnProvider::signin($email, $password);
