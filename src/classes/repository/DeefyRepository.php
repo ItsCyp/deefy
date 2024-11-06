@@ -226,4 +226,9 @@ class DeefyRepository
         $stmt = $this->pdo->prepare('INSERT INTO user (email, passwd, role) VALUES (:email, :passwd, 1)');
         $stmt->execute(['email' => $email, 'passwd' => $hashed_password]);
     }
+
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
 }

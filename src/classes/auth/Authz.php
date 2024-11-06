@@ -47,14 +47,18 @@ class Authz
      */
     public static function checkPlaylistOwner(int $playlistId): void
     {
-        $user = AuthnProvider::getSignedInUser();
-        $repo = DeefyRepository::getInstance();
-        $stmt = $repo->getPdo()->prepare('SELECT * FROM user2playlist WHERE id_user = :userId AND id_pl = :playlistId');
-        $stmt->execute(['userId' => $user->id, 'playlistId' => $playlistId]);
-        $access = $stmt->fetch();
+        try {
+            $user = AuthnProvider::getSignedInUser();
+            $repo = DeefyRepository::getInstance();
+            $stmt = $repo->getPdo()->prepare('SELECT * FROM user2playlist WHERE id_user = :userId AND id_pl = :playlistId');
+            $stmt->execute(['userId' => $user->id, 'playlistId' => $playlistId]);
+            $access = $stmt->fetch();
 
-        if (!$access && $user->role !== 100) {
-            throw new AccessControlException("L'utilisateur n'a pas accès à la playlist ou n'est pas administrateur.");
+            if (!$access && $user->role !== 100) {
+                throw new AccessControlException("L'utilisateur n'a pas accès à la playlist ou n'est pas administrateur.");
+            }
+        } catch (\PDOException $e) {
+            throw new AccessControlException("Erreur lors de la vérification de l'accès à la playlist : " . $e->getMessage());
         }
     }
 }
