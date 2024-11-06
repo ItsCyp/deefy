@@ -23,10 +23,7 @@ class AuthnProvider
     {
         $repo = DeefyRepository::getInstance();
         try {
-            $stmt = $repo->getPdo()->prepare('SELECT * FROM user WHERE email = :email');
-            $stmt->execute(['email' => $email]);
-            $user = $stmt->fetch();
-            $user = new User($user['id'], $user['email'], $user['passwd'], $user['role']);
+            $user = $repo->getUserByEmail($email);
 
             if ($user->verifyPassword($password)) {
                 $_SESSION['user'] = serialize($user);
@@ -53,15 +50,7 @@ class AuthnProvider
 
         $repo = DeefyRepository::getInstance();
         try {
-            $stmt = $repo->getPdo()->prepare('SELECT email FROM user WHERE email = :email');
-            $stmt->execute(['email' => $email]);
-            if ($stmt->fetch()) {
-                throw new AuthnException("An account with this email already exists.");
-            }
-
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $repo->getPdo()->prepare('INSERT INTO user (email, passwd, role) VALUES (:email, :passwd, 1)');
-            $stmt->execute(['email' => $email, 'passwd' => $hashed_password]);
+            $repo->saveUser($email, $password);
 
             self::signin($email, $password);
         } catch (\PDOException $e) {

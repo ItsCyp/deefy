@@ -5,6 +5,7 @@ namespace iutnc\deefy\repository;
 use iutnc\deefy\audio\lists\Playlist;
 use iutnc\deefy\audio\tracks\AlbumTrack;
 use iutnc\deefy\audio\tracks\AudioTrack;
+use iutnc\deefy\auth\User;
 use PDO;
 use PDOException;
 
@@ -200,13 +201,29 @@ class DeefyRepository
         return $playlists;
     }
 
-    /**
-     * Retourne l'instance PDO
-     *
-     * @return PDO
-     */
-    public function getPdo()
+
+    public function getUserByEmail(string $email): User
     {
-        return $this->pdo;
+        $stmt = $this->pdo->prepare('SELECT * FROM user WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+        $user = $stmt->fetch();
+        if ($user === false) {
+            throw new PDOException("Utilisateur non trouvé.");
+        }
+
+        return new User($user['id'], $user['email'], $user['passwd'], $user['role']);
+    }
+
+    public function saveUser(string $email, string $password): void
+    {
+        $stmt = $this->pdo->prepare('SELECT email FROM user WHERE email = :email');
+        $stmt->execute(['email' => $email]);
+        if ($stmt->fetch()) {
+            throw new PDOException("Un compte avec cet email existe déjà.");
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare('INSERT INTO user (email, passwd, role) VALUES (:email, :passwd, 1)');
+        $stmt->execute(['email' => $email, 'passwd' => $hashed_password]);
     }
 }
