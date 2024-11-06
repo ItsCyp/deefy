@@ -32,7 +32,7 @@ nav {
 
 .nav-links {
     display: flex;
-    background: rgba(52, 52, 74, 0.6); /* Couleur de fond semi-transparente */
+    background: rgba(61, 61, 93, 0.6); /* Couleur de fond semi-transparente */
     border-radius: 40px; /* Bords arrondis */
     padding: 16px 40px;
     backdrop-filter: blur(40px); /* Effet de flou */
